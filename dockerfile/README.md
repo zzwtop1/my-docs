@@ -1,4 +1,4 @@
-语言: [English](README.EN.md) | [简体中文](README.md)
+语言: [English](README-EN.md) | [简体中文](README.md)
 目前有2个文件  
 1.docker-my-conda  
 根据ubuntu:22.04创建conda镜像文件的dockerfile，使用该文件创建一个名字叫my-conda，
