@@ -1,0 +1,62 @@
+#继承之前构建的conda镜像，已创建了虚拟环境my-env，python版本3.10.15并设置了环境变量MY_ENV
+FROM my-conda:1.0
+
+#安装cuda源
+RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb && \
+        dpkg -i cuda-keyring_1.1-1_all.deb
+#删除原来的虚拟环境并新建
+RUN conda remove -n $MY_ENV --all -y  && \
+        conda create -n $MY_ENV python==3.11.13 -y
+
+# apt-get 安装包并清理缓存
+RUN apt-get  update && \
+        apt-get install -y \
+        --no-install-recommends \
+        build-essential \
+        openssh-server \
+        locales \
+        fonts-wqy-zenhei \
+        git \
+        cuda-toolkit-12-9 \
+        libcurl4-openssl-dev \
+        vim && \
+        apt-get clean && \
+        rm -rf /var/lib/apt/lists/* cuda-keyring_1.1-1_all.deb
+
+#单独安装pytorch
+RUN conda run -n $MY_ENV \
+        --live-stream \
+        pip install  --index-url https://download.pytorch.org/whl/cu128 \
+        torch==2.7.1 \
+        torchvision==0.22.1 \
+        torchaudio==2.7.1
+
+#在 my-env 环境中使用pip安装所需包并清理缓存
+RUN conda run -n $MY_ENV \
+        --live-stream \
+        pip install \
+        transformers==4.52.4 \
+        sympy==1.13.3 \
+        accelerate==1.7.0 \
+        cmake==4.0.3 \
+        modelscope==1.27.0 \
+        sentencepiece==0.2.0 \
+        protobuf==6.31.1
+
+#设置nvcc环境变量
+ENV PATH=/usr/local/cuda/bin:$PATH
+ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64
+
+#在/data下创建git-project，并git下载llama.cpp项目
+RUN mkdir /data/git-project && \
+         cd /data/git-project && \
+         git clone https://github.com/ggml-org/llama.cpp.git &&\
+         cd /data/git-project/llama.cpp && \
+         conda run -n $MY_ENV cmake -B build -DGGML_CUDA=ON && \
+         conda run -n $MY_ENV cmake --build build -- -j4
+
+#设置llama.cpp编译后的文件所在目录到环境变量中
+ENV PATH=/data/git-project/llama.cpp/build/bin:$PATH
+
+#设置工作目录
+WORKDIR /data/git-project/llama.cpp
