@@ -1,4 +1,4 @@
-Language: [English](README.EN.md) | [简体中文](README.md)
+Language: [English](README-EN.md) | [简体中文](README.md)
 There are currently two Dockerfiles available:
 1. docker-my-conda  
 This Dockerfile builds a Conda-based image based on ubuntu:22.04.
