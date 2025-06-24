@@ -5,7 +5,7 @@
 版本1.0的镜像，方法`docker build -t my-conda:1.0 -f docker-my-conda .`，
 注意最后有个点，如果本地没有ubuntu:22.04的镜像会自动联网下载 
 
-2.docker-my-llama_cpp 
+2.docker-my-llama_cpp  
 根据之前创建的conda镜像新建一个llama.cpp项目的镜像，
 如果你之前创建的conda镜像名字和版本不是my-conda:1.0，
 那么需要修改docker-my-llama_cpp的FROM后面的内容，`git clone https://github.com/ggml-org/llama.cpp.git`这部分拉取的是线上最新版本,
