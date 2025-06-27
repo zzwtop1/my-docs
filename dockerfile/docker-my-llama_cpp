@@ -23,6 +23,7 @@ RUN apt-get  update && \
         apt-get clean && \
         rm -rf /var/lib/apt/lists/* cuda-keyring_1.1-1_all.deb
 
+
 #单独安装pytorch
 RUN conda run -n $MY_ENV \
         --live-stream \
@@ -60,3 +61,13 @@ ENV PATH=/data/git-project/llama.cpp/build/bin:$PATH
 
 #设置工作目录
 WORKDIR /data/git-project/llama.cpp
+
+# 生成并启用 zh_CN.UTF-8
+RUN sed -i '/^# *zh_CN.UTF-8/s/^# *//' /etc/locale.gen && \
+    locale-gen zh_CN.UTF-8 && \
+    update-locale LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
+
+# 设置语言的环境变量
+ENV LANG=zh_CN.UTF-8 \
+    LANGUAGE=zh_CN:zh \
+    LC_ALL=zh_CN.UTF-8
